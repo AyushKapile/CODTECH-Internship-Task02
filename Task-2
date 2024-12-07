@@ -1,0 +1,201 @@
+/* This is my second CODTECH internship project of (library mangement system)  */
+
+/****java file ******/
+
+
+/*Item.java */
+
+package com.library.model;
+
+public abstract class Item {
+    private String title;
+    private String author;
+    private String category;
+    private boolean isCheckedOut;
+    private String dueDate;
+
+    // Constructors, getters, and setters
+    public Item(String title, String author, String category) {
+        this.title = title;
+        this.author = author;
+        this.category = category;
+        this.isCheckedOut = false;
+        this.dueDate = null;
+    }
+
+    public String getTitle() { return title; }
+    public String getAuthor() { return author; }
+    public String getCategory() { return category; }
+    public boolean isCheckedOut() { return isCheckedOut; }
+    public String getDueDate() { return dueDate; }
+
+    public void setCheckedOut(boolean checkedOut) { isCheckedOut = checkedOut; }
+    public void setDueDate(String dueDate) { this.dueDate = dueDate; }
+}
+
+/*These classes extend the Item class:*/
+
+package com.library.model;
+
+public class Book extends Item {
+    public Book(String title, String author, String category) {
+        super(title, author, category);
+    }
+}
+
+/*User.java*/
+package com.library.model;
+
+public abstract class User {
+    private String name;
+    private String userId;
+
+    // Constructors, getters, and setters
+    public User(String name, String userId) {
+        this.name = name;
+        this.userId = userId;
+    }
+
+    public String getName() { return name; }
+    public String getUserId() { return userId; }
+}
+package com.library.model;
+
+public class Librarian extends User {
+    public Librarian(String name, String userId) {
+        super(name, userId);
+    }
+
+    // Additional methods for librarian functionality
+}
+
+public class Patron extends User {
+    public Patron(String name, String userId) {
+        super(name, userId);
+    }
+}
+
+package com.library.service;
+
+import com.library.model.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class LibraryService {
+    private List<Item> items;
+
+    public LibraryService() {
+        this.items = new ArrayList<>();
+    }
+
+    public void addItem(Item item) {
+        items.add(item);
+    }
+
+    public void checkOutItem(String title, String userId) {
+        for (Item item : items) {
+            if (item.getTitle().equalsIgnoreCase(title) && !item.isCheckedOut()) {
+                item.setCheckedOut(true);
+                // Set due date logic here
+                System.out.println(userId + " checked out " + title);
+                return;
+            }
+        }
+        System.out.println("Item not available for checkout.");
+    }
+
+    public void returnItem(String title, String userId) {
+        for (Item item : items) {
+            if (item.getTitle().equalsIgnoreCase(title) && item.isCheckedOut()) {
+                item.setCheckedOut(false);
+                item.setDueDate(null);
+                System.out.println(userId + " returned " + title);
+                return;
+            }
+        }
+        System.out.println("Item not found or not checked out.");
+    }
+
+    public List<Item> searchItems(String query) {
+        List<Item> results = new ArrayList<>();
+        for (Item item : items) {
+            if (item.getTitle().equalsIgnoreCase(query) ||
+                item.getAuthor().equalsIgnoreCase(query) ||
+                item.getCategory().equalsIgnoreCase(query)) {
+                results.add(item);
+            }
+        }
+        return results;
+    }
+
+    public void manageFines() {
+        
+    }
+}
+package com.library.main;
+
+import com.library.model.*;
+import com.library.service.LibraryService;
+
+import java.util.Scanner;
+
+public class LibraryManagementApp {
+    public static void main(String[] args) {
+        LibraryService libraryService = new LibraryService();
+        Scanner scanner = new Scanner(System.in);
+
+        // Example items
+        libraryService.addItem(new Book("Harry Potter", "J.K. Rowling", "Fantasy"));
+        libraryService.addItem(new DVD("Inception", "Christopher Nolan", "Sci-Fi"));
+        libraryService.addItem(new Magazine("Time", "Time Inc.", "News"));
+
+        System.out.println("Welcome to the Library Management System!");
+        while (true) {
+            System.out.println("1. Add Item");
+            System.out.println("2. Check Out Item");
+            System.out.println("3. Return Item");
+            System.out.println("4. Search Items");
+            System.out.println("5. Exit");
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    // Add item logic here
+                    break;
+                case 2:
+                    System.out.print("Enter title to check out: ");
+                    String checkOutTitle = scanner.nextLine();
+                    System.out.print("Enter your user ID: ");
+                    String checkOutUserId = scanner.nextLine();
+                    libraryService.checkOutItem(checkOutTitle, checkOutUserId);
+                    break;
+                case 3:
+                    System.out.print("Enter title to return: ");
+                    String returnTitle = scanner.nextLine();
+                    System.out.print("Enter your user ID: ");
+                    String returnUserId = scanner.nextLine();
+                    libraryService.returnItem(returnTitle, returnUserId);
+                    break;
+                case 4:
+                    System.out.print("Enter title, author, or category to search: ");
+                    String query = scanner.nextLine();
+                    libraryService.searchItems(query).forEach(item -> System.out.println(item.getTitle()));
+                    break;
+                case 5:
+                    System.out.println("Goodbye!");
+                    scanner.close();
+                    System.exit(0);
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}
+
+
+
+
+
+
